@@ -1,3 +1,10 @@
-fun main() {
 
+
+fun main() {
+    CLI.interpolation()
 }
+
+
+
+
+
