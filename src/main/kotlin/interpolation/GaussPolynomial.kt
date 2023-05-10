@@ -126,7 +126,6 @@ object GaussPolynomial : Interpolation() {
         (0..n).forEach { pr *= t - it.toBigDecimal() }
 
         return (table[n][n] * pr)/factorial(n + 1).toBigDecimal()
-        //return 0.0.toBigDecimal()
     }
     private fun checkUniformity(x: ArrayList<BigDecimal>): BigDecimal {
         val h = x[1] - x[0]

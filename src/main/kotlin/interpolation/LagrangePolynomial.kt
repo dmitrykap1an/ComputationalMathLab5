@@ -12,13 +12,16 @@ object LagrangePolynomial : Interpolation() {
             x: BigDecimal ->
             var sum = 0.0.toBigDecimal()
             for (i in 0 .. n) {
-                var p = 1.0.toBigDecimal()
+                var pv = 1.0.toBigDecimal()
+                var pn = 1.0.toBigDecimal()
                 for (j in 0 .. n) {
                     if (i != j) {
-                        p *= (x - arrX[j]) / (arrX[i] - arrX[j])
+                        pv *= (x - arrX[j])
+                        pn *= (arrX[i] - arrX[j])
                     }
                 }
-                sum += p * arrY[i]
+                if(pn >= 0.0.toBigDecimal() && pn <= 0E-9.toBigDecimal()) pn = 0.00001.toBigDecimal()
+                sum += (pv * arrY[i])/pn
             }
             sum
         }

@@ -17,7 +17,7 @@ object CLI {
 
     private lateinit var input: () -> String
     private lateinit var bw: BufferedWriter
-    private val br = BufferedReader(FileReader("src/files/tasks/task1.txt"))
+    private val br = BufferedReader(FileReader("src/files/tasks/task2.txt"))
     private var visible = true
     private var dataTable: Pair<ArrayList<BigDecimal>, ArrayList<BigDecimal>>? = null
 
@@ -35,7 +35,7 @@ object CLI {
             showPlot(dataTable!!, lagrange)
         }
         else{
-            lagrange.errorEstimation = ((gauss.errorEstimation!! + gauss.value) - lagrange.value)
+            //lagrange.errorEstimation = ((gauss.errorEstimation!! + gauss.value) - lagrange.value)
             printResult(lagrange)
             printResult(gauss)
             showPlot(dataTable!!, lagrange, gauss)
