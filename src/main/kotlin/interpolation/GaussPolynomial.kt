@@ -105,7 +105,7 @@ object GaussPolynomial : Interpolation() {
         return Result(f(argument), f, "Первая интерполяционная формула Гаусса")
     }
 
-    private fun getTableOfFiniteDifferences(y: ArrayList<BigDecimal>): ArrayList<ArrayList<BigDecimal>> {
+    fun getTableOfFiniteDifferences(y: ArrayList<BigDecimal>): ArrayList<ArrayList<BigDecimal>> {
         val table = ArrayList<ArrayList<BigDecimal>>()
         table.add(y)
         val n = y.size - 1

@@ -35,11 +35,29 @@ object CLI {
             showPlot(dataTable!!, lagrange)
         }
         else{
+            val table = GaussPolynomial.getTableOfFiniteDifferences(dataTable!!.second)
             //lagrange.errorEstimation = ((gauss.errorEstimation!! + gauss.value) - lagrange.value)
+            printTable(table)
             printResult(lagrange)
             printResult(gauss)
             showPlot(dataTable!!, lagrange, gauss)
         }
+
+    }
+
+    private fun printTable(table: ArrayList<ArrayList<BigDecimal>>) {
+        println("ТАБЛИЦА КОНЕЧНЫХ РАЗНОСТЕЙ")
+        println("---" * (table[0].size + 5))
+        val y = table[0]
+        print("yi: ")
+        y.forEach{ print("$it ") }
+        println()
+        for(i in 1 until table.size){
+            print("dy^$i: ")
+            table[i].forEach{print("$it ")}
+            println()
+        }
+        println("---" * (table[0].size + 5))
 
     }
 
@@ -243,7 +261,7 @@ object CLI {
     private fun ask(text: String) {
         if (visible) print(text)
     }
-    private fun askln(text: String) {
+    private fun askln(text: String? = null) {
         if (visible) println(text)
     }
 
@@ -260,6 +278,14 @@ object CLI {
 
 
 
+}
+
+private operator fun String.times(i: Int): String{
+    val stringBuilder = StringBuilder()
+    for(i in 1..i){
+        stringBuilder.append(this)
+    }
+    return stringBuilder.toString()
 }
 
 fun min(x: BigDecimal, y: BigDecimal): BigDecimal{
