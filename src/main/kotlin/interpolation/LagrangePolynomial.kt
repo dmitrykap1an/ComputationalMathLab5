@@ -50,7 +50,6 @@ object LagrangePolynomial : Interpolation() {
             max = max(max, fn1(it))
         }
 
-
         return max * (f2(argument)).abs()/(factorial(n + 1 )).toBigDecimal()
     }
 

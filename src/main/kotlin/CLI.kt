@@ -17,7 +17,7 @@ object CLI {
 
     private lateinit var input: () -> String
     private lateinit var bw: BufferedWriter
-    private val br = BufferedReader(FileReader("src/files/tasks/task2.txt"))
+    private val br = BufferedReader(FileReader("src/files/tasks/task1.txt"))
     private var visible = true
     private var dataTable: Pair<ArrayList<BigDecimal>, ArrayList<BigDecimal>>? = null
 
@@ -28,13 +28,12 @@ object CLI {
         askOutputOption()
         val lagrange = LagrangePolynomial.solve(dataTable!!, argument)
         val gauss = GaussPolynomial.solve(dataTable!!, argument)
-        if(gauss == null){
+        if (gauss == null) {
             bw.write("Невозожно найти интерполяционный многочлены Гаусса, так как узлы не равноотстающие")
             bw.newLine()
             printResult(lagrange)
             showPlot(dataTable!!, lagrange)
-        }
-        else{
+        } else {
             val table = GaussPolynomial.getTableOfFiniteDifferences(dataTable!!.second)
             //lagrange.errorEstimation = ((gauss.errorEstimation!! + gauss.value) - lagrange.value)
             printTable(table)
@@ -50,11 +49,11 @@ object CLI {
         println("---" * (table[0].size + 5))
         val y = table[0]
         print("yi: ")
-        y.forEach{ print("$it ") }
+        y.forEach { print("$it ") }
         println()
-        for(i in 1 until table.size){
+        for (i in 1 until table.size) {
             print("dy^$i: ")
-            table[i].forEach{print("$it ")}
+            table[i].forEach { print("$it ") }
             println()
         }
         println("---" * (table[0].size + 5))
@@ -63,10 +62,10 @@ object CLI {
 
     private fun askArgument(): BigDecimal {
         ask("Введите координату x, в которой найти значение функции: ")
-        while(true){
-            try{
+        while (true) {
+            try {
                 return input().toBigDecimal()
-            } catch (e: NumberFormatException){
+            } catch (e: NumberFormatException) {
                 askln("Координата должна быть представлена числом!")
             }
         }
@@ -140,7 +139,7 @@ object CLI {
 
                     2 -> selectFunction()
 
-                    else ->  {
+                    else -> {
                         askln("Ответ должен быть в промежутке от 1 до 2!")
                         continue
                     }
@@ -154,10 +153,10 @@ object CLI {
 
     private fun selectFunction(): Pair<ArrayList<BigDecimal>, ArrayList<BigDecimal>> {
         askln("Выберете функцию для интерполяции: ")
-        functions.forEach{
+        functions.forEach {
             askln("${it.key}) ${it.value.getStringFunction()}")
         }
-        while(true) {
+        while (true) {
             try {
                 val n = readln().toInt()
                 if (n in 1..functions.size) {
@@ -165,15 +164,14 @@ object CLI {
                     f.setInterval(askInterval())
                     f.setNumberOfDots(askNumberOfDots())
                     return generateDataTable(functions[n]!!)
-                }
-                else askln( "Ответ должен быть в промежутке от 1 до ${functions.size}")
-            } catch (e: NumberFormatException){
+                } else askln("Ответ должен быть в промежутке от 1 до ${functions.size}")
+            } catch (e: NumberFormatException) {
                 askln("Ответ должен быть представлен числом!")
             }
         }
     }
 
-    private fun askInterval(): Pair<BigDecimal, BigDecimal>{
+    private fun askInterval(): Pair<BigDecimal, BigDecimal> {
         while (true) {
             try {
                 ask("Введите границы области: ")
@@ -200,67 +198,94 @@ object CLI {
 
     }
 
-    private fun generateDataTable(function: Function): Pair<ArrayList<BigDecimal>, ArrayList<BigDecimal>>{
+    private fun generateDataTable(function: Function): Pair<ArrayList<BigDecimal>, ArrayList<BigDecimal>> {
         var (a, b) = function.getInterval()!!
         val f = function.getF()
-        val step =(b - a).abs()/function.getNumberOfDots()!!.toBigDecimal()
+        val step = (b - a).abs() / function.getNumberOfDots()!!.toBigDecimal()
         val x = ArrayList<BigDecimal>()
         val y = ArrayList<BigDecimal>()
-        while(a <= b){
+        while (a <= b) {
             x.add(a)
             y.add(f(a))
-            a+=step
+            a += step
         }
         return x to y
     }
 
-    private fun printResult(result: Result){
+    private fun printResult(result: Result) {
         bw.write(result.method.uppercase())
         bw.newLine()
         bw.write("Значение функции: ${result.value}")
         bw.newLine()
-        bw.write("Оценка погрешности: ${result.errorEstimation}")
+//        bw.write("Оценка погрешности: ${result.errorEstimation}")
+//        bw.newLine()
+        bw.write("-----------------------------------")
         bw.newLine()
         bw.flush()
     }
 
-    private fun showPlot( dataTable: Pair<ArrayList<BigDecimal>, ArrayList<BigDecimal>>, result: Result){
+    private fun showPlot(dataTable: Pair<ArrayList<BigDecimal>, ArrayList<BigDecimal>>, result: Result) {
         val (xd, yd) = dataTable
-        val listY = generateData(result.f, xd)
+        val (listX, listY) = generateData(result.f, xd)
         val d = mapOf(
-            xd to yd, xd to listY
+            xd to yd, listX to listY
         )
 
-        val plot = letsPlot(d) + geomArea(fill = "white", color = "red"){ x = xd; y = listY} +
-                geomPoint(size = 3, fill = "white"){x = xd; y = yd}
+        val plot = letsPlot(d) + geomArea(fill = "white", color = "red") { x = xd; y = listY } +
+                geomPoint(size = 3, fill = "white") { x = xd; y = yd }
         plot.show()
     }
 
 
-    private fun showPlot( dataTable: Pair<ArrayList<BigDecimal>, ArrayList<BigDecimal>>, lagrange: Result, gauss: Result){
+    private fun showPlot(
+        dataTable: Pair<ArrayList<BigDecimal>, ArrayList<BigDecimal>>,
+        lagrange: Result,
+        gauss: Result
+    ) {
         val (xd, yd) = dataTable
-        val lagrangeY = generateData(lagrange.f, xd)
-        val gaussY = generateData(gauss.f, xd)
+        val (lagrangeX, lagrangeY) = generateData(lagrange.f, xd)
+        val (gaussX, gaussY) = generateData(gauss.f, xd)
+        val newX = ArrayList<BigDecimal>()
+        val newY = ArrayList<BigDecimal>()
+        for(i in xd.size + 1..lagrangeX.size){
+            newX.add(0.0.toBigDecimal())
+            newY.add(0.0.toBigDecimal())
+        }
+        newX.addAll(xd)
+        newY.addAll(yd)
+        println(newX.size)
+        println(lagrangeX.size)
         val d = mapOf(
-            xd to yd, xd to lagrangeY, xd to gaussY
+            newX to newY, lagrangeX to lagrangeY, gaussX to gaussY
         )
 
-        val plot = letsPlot(d) + geomArea(fill = "white", color = "red"){ x = xd; y = lagrangeY} +
-                geomArea(fill = "white", color = "yellow"){x = xd; y = gaussY} +
-                geomPoint(size = 3, fill = "white"){x = xd; y = yd}
+        val plot = letsPlot(d) + geomArea(fill = "white", color = "red") { x = lagrangeX; y = lagrangeY } +
+                geomArea(fill = "white", color = "blue") { x = gaussX; y = gaussY } +
+                geomPoint(size = 3, fill = "white") { x = newX; y = newY }
+
         plot.show()
     }
 
-    private fun generateData(f: (BigDecimal) -> BigDecimal, x: ArrayList<BigDecimal>): ArrayList<BigDecimal>{
+    private fun generateData(f: (BigDecimal) -> BigDecimal, x: ArrayList<BigDecimal>): Pair<ArrayList<BigDecimal>, ArrayList<BigDecimal>> {
         val y = ArrayList<BigDecimal>()
-        x.forEach{ y.add(f(it))}
-        return y
+        val xd = ArrayList<BigDecimal>()
+        var start = x.first().toDouble()
+        var finish = x.last().toDouble()
+        var h = (finish - start)/40.0
+        while(start < finish){
+            y.add(f(start.toBigDecimal()))
+            xd.add(start.toBigDecimal())
+            start += h;
+        }
+
+        return xd to y
     }
 
 
     private fun ask(text: String) {
         if (visible) print(text)
     }
+
     private fun askln(text: String? = null) {
         if (visible) println(text)
     }
@@ -277,22 +302,22 @@ object CLI {
     }
 
 
-
 }
 
-private operator fun String.times(i: Int): String{
+private operator fun String.times(i: Int): String {
     val stringBuilder = StringBuilder()
-    for(i in 1..i){
+    for (i in 1..i) {
         stringBuilder.append(this)
     }
     return stringBuilder.toString()
 }
 
-fun min(x: BigDecimal, y: BigDecimal): BigDecimal{
-    return if(x <= y) x
+fun min(x: BigDecimal, y: BigDecimal): BigDecimal {
+    return if (x <= y) x
     else y
 }
-fun max(x: BigDecimal, y: BigDecimal): BigDecimal{
-    return if(x >= y) x
+
+fun max(x: BigDecimal, y: BigDecimal): BigDecimal {
+    return if (x >= y) x
     else y
 }

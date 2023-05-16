@@ -74,13 +74,13 @@ object GaussPolynomial : Interpolation() {
         a: BigDecimal,
         h: BigDecimal
     ): Result {
-        val (x, y) = dataTable
-        val n = x.size - 1
+        val (xd, y) = dataTable
+        val n = xd.size - 1
         val table = getTableOfFiniteDifferences(y)
-        var index = x.indexOf(a)
-        val t = (argument - a) / h
         val f = { x: BigDecimal ->
             var j = 0
+            var index = xd.indexOf(a)
+            val t = (x - a) / h
             var sum = table[j][index]
             var tsum = 1.0.toBigDecimal()
             var cnt = 0.0.toBigDecimal()
@@ -102,7 +102,7 @@ object GaussPolynomial : Interpolation() {
             sum
         }
 
-        return Result(f(argument), f, "Первая интерполяционная формула Гаусса")
+        return Result(f(argument), f, "Вторая интерполяционная формула Гаусса", errorEstimation(table, a, n/2, (argument - a) / h))
     }
 
     fun getTableOfFiniteDifferences(y: ArrayList<BigDecimal>): ArrayList<ArrayList<BigDecimal>> {
@@ -124,7 +124,6 @@ object GaussPolynomial : Interpolation() {
     private fun errorEstimation(table: ArrayList<ArrayList<BigDecimal>>, y0: BigDecimal, n: Int, t: BigDecimal): BigDecimal{
         var pr = 1.0.toBigDecimal()
         (0..n).forEach { pr *= t - it.toBigDecimal() }
-
         return (table[n][n] * pr)/factorial(n + 1).toBigDecimal()
     }
     private fun checkUniformity(x: ArrayList<BigDecimal>): BigDecimal {
